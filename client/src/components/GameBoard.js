@@ -1,164 +1,173 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
+import './App.css';
+import Lobby from './components/Lobby';
+import GameBoard from './components/GameBoard';
+import GuessPanel from './components/GuessPanel';
 
-// Example: 4 blocks to arrange
-const BLOCK_COUNT = 4;
+function App() {
+  const colors = ['red', 'blue', 'green', 'purple', 'yellow', 'orange'];
+  const codeLength = 4;
 
-// Helper: create an array of n shuffled colors
-function getDefaultBlocks() {
-  const colors = ["red", "blue", "green", "yellow"];
-  return colors.slice(0, BLOCK_COUNT);
-}
+  const [gameState, setGameState] = useState('lobby');
+  const [playerName, setPlayerName] = useState('');
+  const [currentGuess, setCurrentGuess] = useState(Array(codeLength).fill(''));
+  const [guesses, setGuesses] = useState([]);
+  const [targetCode, setTargetCode] = useState([]);
 
-function GameBoard({ player, gameState, onArrange }) {
-  const [arrangement, setArrangement] = useState(getDefaultBlocks());
-  const [draggedIndex, setDraggedIndex] = useState(null);
-
-  // Allow the player to arrange blocks if arrangement not yet submitted
-  const canArrange =
-    !gameState ||
-    !gameState.arrangements ||
-    !gameState.arrangements[player];
-
-  const handleSwap = (i, j) => {
-    const newArr = [...arrangement];
-    [newArr[i], newArr[j]] = [newArr[j], newArr[i]];
-    setArrangement(newArr);
+  const startGame = (name) => {
+    setPlayerName(name);
+    setGameState('playing');
+    const code = Array.from({ length: codeLength }, () =>
+      colors[Math.floor(Math.random() * colors.length)]
+    );
+    setTargetCode(code);
+    setGuesses([]);
+    setCurrentGuess(Array(codeLength).fill(''));
   };
 
-  const handleDragStart = (e, index) => {
-    if (!canArrange) return;
-    setDraggedIndex(index);
-    e.dataTransfer.effectAllowed = "move";
-  };
+  const submitGuess = (guessArr) => {
+    if (guessArr.length !== codeLength || guessArr.some(c => !c)) return;
 
-  const handleDragOver = (e) => {
-    e.preventDefault();
-  };
+    const newGuess = {
+      code: guessArr,
+      feedback: generateFeedback(guessArr, targetCode),
+      timestamp: Date.now()
+    };
 
-  const handleDrop = (e, dropIndex) => {
-    e.preventDefault();
-    if (draggedIndex !== null && draggedIndex !== dropIndex) {
-      handleSwap(draggedIndex, dropIndex);
+    const updatedGuesses = [...guesses, newGuess];
+    setGuesses(updatedGuesses);
+    setCurrentGuess(Array(codeLength).fill(''));
+
+    if (arraysEqual(guessArr, targetCode)) {
+      setGameState('finished');
     }
-    setDraggedIndex(null);
   };
 
-  const handleSubmit = () => {
-    onArrange(arrangement);
+  const arraysEqual = (a, b) =>
+    a.length === b.length && a.every((v, i) => v === b[i]);
+
+  const generateFeedback = (guess, target) => {
+    let correct = 0;
+    let wrongPosition = 0;
+    const targetUsed = new Array(codeLength).fill(false);
+    const guessUsed = new Array(codeLength).fill(false);
+
+    for (let i = 0; i < codeLength; i++) {
+      if (guess[i] === target[i]) {
+        correct++;
+        targetUsed[i] = true;
+        guessUsed[i] = true;
+      }
+    }
+    for (let i = 0; i < codeLength; i++) {
+      if (!guessUsed[i]) {
+        for (let j = 0; j < codeLength; j++) {
+          if (!targetUsed[j] && guess[i] === target[j]) {
+            wrongPosition++;
+            targetUsed[j] = true;
+            break;
+          }
+        }
+      }
+    }
+    return { correct, wrongPosition };
   };
 
-  const getBlockStyle = (color, index) => ({
-    width: 60,
-    height: 60,
-    background: color,
-    border: draggedIndex === index ? "3px solid #fff" : "2px solid #444",
-    borderRadius: 12,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontWeight: "bold",
-    fontSize: "14px",
-    color: "#fff",
-    cursor: canArrange ? "grab" : "default",
-    transition: "all 0.2s ease",
-    opacity: draggedIndex === index ? 0.5 : 1,
-    transform: draggedIndex === index ? "rotate(5deg)" : "none",
-    boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
-  });
-
-  const currentPhase = gameState?.currentPhase || "arranging";
-  const timeRemaining = gameState?.timeRemaining || 0;
+  const resetGame = () => {
+    setGameState('lobby');
+    setPlayerName('');
+    setCurrentGuess(Array(codeLength).fill(''));
+    setGuesses([]);
+    setTargetCode([]);
+  };
 
   return (
-    <div style={{ marginTop: 32, textAlign: "center" }}>
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-        <h2 style={{ margin: 0 }}>Your Block Arrangement</h2>
-        {currentPhase === "arranging" && (
-          <div style={{ 
-            fontSize: "18px", 
-            fontWeight: "bold", 
-            color: timeRemaining < 10 ? "#ff4444" : "#333" 
-          }}>
-            Time: {timeRemaining}s
+    <div className="App">
+      <header className="App-header">
+        <h1>🔒 Block-Lock</h1>
+        <p>Crack the color code!</p>
+        <div style={{ margin: '1rem 0' }}>
+          <span style={{ fontWeight: 600 }}>Colors:</span>
+          {colors.map(color => (
+            <span
+              key={color}
+              style={{
+                display: 'inline-block',
+                background: color,
+                width: 22,
+                height: 22,
+                borderRadius: '50%',
+                margin: '0 5px',
+                border: '2px solid #444',
+                verticalAlign: 'middle',
+              }}
+              title={color}
+            ></span>
+          ))}
+        </div>
+      </header>
+
+      <main className="App-main">
+        {gameState === 'lobby' && (
+          <Lobby onStartGame={startGame} />
+        )}
+
+        {gameState === 'playing' && (
+          <div className="game-container">
+            <div className="game-info">
+              <h2>Welcome, {playerName}!</h2>
+              <p>Attempts: {guesses.length}</p>
+            </div>
+            {/* Only show PREVIOUS guesses here */}
+            <GameBoard
+              guesses={guesses}
+              colors={colors}
+              codeLength={codeLength}
+            />
+            {/* Show the "current guess" as a single line in GuessPanel */}
+            <GuessPanel
+              currentGuess={currentGuess}
+              onGuessChange={setCurrentGuess}
+              onSubmitGuess={submitGuess}
+              colors={colors}
+              codeLength={codeLength}
+            />
           </div>
         )}
-      </div>
-      
-      <div style={{ 
-        display: "flex", 
-        gap: 12, 
-        justifyContent: "center",
-        padding: 20,
-        backgroundColor: "#f5f5f5",
-        borderRadius: 16,
-        marginBottom: 16
-      }}>
-        {arrangement.map((color, idx) => (
-          <div
-            key={idx}
-            style={getBlockStyle(color, idx)}
-            title={`${color} block - ${canArrange ? 'drag to rearrange' : 'submitted'}`}
-            draggable={canArrange}
-            onDragStart={(e) => handleDragStart(e, idx)}
-            onDragOver={handleDragOver}
-            onDrop={(e) => handleDrop(e, idx)}
-            onClick={() => 
-              canArrange && idx < arrangement.length - 1 
-                ? handleSwap(idx, idx + 1) 
-                : undefined
-            }
-          >
-            {color.charAt(0).toUpperCase()}
+
+        {gameState === 'finished' && (
+          <div className="game-finished">
+            <h2>🎉 Congratulations, {playerName}!</h2>
+            <p>You cracked the code in {guesses.length} attempts!</p>
+            <p>
+              The code was:{' '}
+              <span>
+                {targetCode.map((color, idx) => (
+                  <span
+                    key={idx}
+                    style={{
+                      display: 'inline-block',
+                      background: color,
+                      width: 22,
+                      height: 22,
+                      borderRadius: '50%',
+                      margin: '0 5px',
+                      border: '2px solid #444',
+                      verticalAlign: 'middle',
+                    }}
+                    title={color}
+                  ></span>
+                ))}
+              </span>
+            </p>
+            <button onClick={resetGame} className="play-again-btn">
+              Play Again
+            </button>
           </div>
-        ))}
-      </div>
-
-      {canArrange && (
-        <div style={{ marginBottom: 16 }}>
-          <p style={{ fontSize: "14px", color: "#666", marginBottom: 8 }}>
-            💡 Drag blocks to rearrange, or click to swap with next block
-          </p>
-          <button 
-            onClick={handleSubmit}
-            style={{
-              padding: "12px 24px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              backgroundColor: "#4CAF50",
-              color: "white",
-              border: "none",
-              borderRadius: "8px",
-              cursor: "pointer",
-              transition: "background-color 0.2s ease"
-            }}
-            onMouseOver={(e) => e.target.style.backgroundColor = "#45a049"}
-            onMouseOut={(e) => e.target.style.backgroundColor = "#4CAF50"}
-          >
-            Submit Arrangement
-          </button>
-        </div>
-      )}
-      
-      {!canArrange && (
-        <div style={{ 
-          padding: "16px", 
-          backgroundColor: "#e8f5e8", 
-          borderRadius: "8px",
-          border: "2px solid #4CAF50",
-          color: "#2e7d32",
-          fontWeight: "bold"
-        }}>
-          ✅ Arrangement submitted! Waiting for other players...
-        </div>
-      )}
-
-      {gameState?.players && (
-        <div style={{ marginTop: 20, fontSize: "14px", color: "#666" }}>
-          Players in room: {Object.keys(gameState.players).length}
-        </div>
-      )}
+        )}
+      </main>
     </div>
   );
 }
 
-export default GameBoard;
+export default App;
