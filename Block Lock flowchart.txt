@@ -1,0 +1,29 @@
+Block Lock flowchart
+
+/src
+  /components
+    App.js
+    Lobby.js
+    GuessPanel.js
+    PreviousGuesses.js
+    GameInfo.js
+    HelpModal.js
+    LeaderboardModal.js
+    ConfettiEffect.js
+    ThemeSelector.js
+  /utils
+    generateCode.js
+    generateFeedback.js
+    arraysEqual.js
+    formatTime.js
+    playSound.js
+  /contexts
+    GameContext.js
+  /styles
+    App.css
+    GuessPanel.module.css
+    ...
+/public
+  /sounds
+    win.mp3
+    guess.mp3

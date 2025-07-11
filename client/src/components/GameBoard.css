@@ -1,0 +1,235 @@
+.gameboard-container {
+  margin: 2rem 0;
+}
+
+.gameboard {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.gameboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.guess-column,
+.feedback-column {
+  font-weight: 600;
+  color: #333;
+  font-size: 1.1rem;
+}
+
+.guess-column {
+  flex: 1;
+}
+
+.feedback-column {
+  width: 120px;
+  text-align: center;
+}
+
+.gameboard-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.gameboard-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem;
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.gameboard-row.completed {
+  background: rgba(102, 126, 234, 0.05);
+  border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.gameboard-row.current {
+  background: rgba(255, 193, 7, 0.1);
+  border: 2px solid rgba(255, 193, 7, 0.3);
+  animation: pulse 2s infinite;
+}
+
+.gameboard-row.empty {
+  background: rgba(0, 0, 0, 0.02);
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+}
+
+.guess-display {
+  display: flex;
+  gap: 0.5rem;
+  flex: 1;
+}
+
+.digit-cell {
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: 700;
+  border-radius: 8px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  color: #333;
+  transition: all 0.3s ease;
+}
+
+.digit-cell.current {
+  border-color: #ffc107;
+  background: rgba(255, 193, 7, 0.1);
+  animation: glow 2s infinite;
+}
+
+.digit-cell.empty {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.1);
+  color: transparent;
+}
+
+@keyframes glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 193, 7, 0.3); }
+  50% { box-shadow: 0 0 15px rgba(255, 193, 7, 0.6); }
+}
+
+.feedback-display {
+  width: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  flex-wrap: wrap;
+}
+
+.feedback-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 1px;
+}
+
+.feedback-dot.correct {
+  background: #28a745;
+  box-shadow: 0 0 5px rgba(40, 167, 69, 0.5);
+}
+
+.feedback-dot.wrong-position {
+  background: #ffc107;
+  box-shadow: 0 0 5px rgba(255, 193, 7, 0.5);
+}
+
+.feedback-dot.incorrect {
+  background: #6c757d;
+  box-shadow: 0 0 5px rgba(108, 117, 125, 0.3);
+}
+
+.feedback-placeholder {
+  color: #999;
+  font-size: 1.2rem;
+  font-weight: 600;
+}
+
+.gameboard-footer {
+  margin-top: 1rem;
+  text-align: center;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+}
+
+.gameboard-footer p {
+  color: #667eea;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  .gameboard {
+    padding: 1rem;
+  }
+  
+  .digit-cell {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .feedback-display {
+    width: 100px;
+  }
+  
+  .feedback-dot {
+    width: 10px;
+    height: 10px;
+  }
+  
+  .gameboard-header {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .digit-cell {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
+  }
+  
+  .feedback-display {
+    width: 80px;
+  }
+  
+  .feedback-dot {
+    width: 8px;
+    height: 8px;
+  }
+}
+
+/* --- Add for color block support --- */
+.color-block {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  display: inline-block;
+  margin: 2px;
+  border: 2px solid #e0e0e0;
+  box-sizing: border-box;
+  background: #eee;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.color-block.current {
+  border-color: #ffc107;
+  box-shadow: 0 0 6px #ffc10777;
+}
+/* Responsive color blocks */
+@media (max-width: 768px) {
+  .color-block {
+    width: 28px;
+    height: 28px;
+  }
+}
+@media (max-width: 480px) {
+  .color-block {
+    width: 20px;
+    height: 20px;
+  }
+}
