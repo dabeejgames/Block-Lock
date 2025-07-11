@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/Block-Lock/static/css/main.c8a409cc.css",
+    "main.js": "/Block-Lock/static/js/main.ceeb8a8c.js",
+    "static/js/453.b3e2401d.chunk.js": "/Block-Lock/static/js/453.b3e2401d.chunk.js",
+    "index.html": "/Block-Lock/index.html",
+    "main.c8a409cc.css.map": "/Block-Lock/static/css/main.c8a409cc.css.map",
+    "main.ceeb8a8c.js.map": "/Block-Lock/static/js/main.ceeb8a8c.js.map",
+    "453.b3e2401d.chunk.js.map": "/Block-Lock/static/js/453.b3e2401d.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.c8a409cc.css",
+    "static/js/main.ceeb8a8c.js"
+  ]
+}
